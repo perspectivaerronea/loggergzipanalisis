@@ -1,0 +1,49 @@
+
+
+//FOREVER
+
+forever start server.js -p 8080 -m FORK
+forever start server.js -p 8081 -m CLUSTER
+forever list
+forever stopall
+
+//PM2
+pm2 start server.js  --name="Server1" --watch -- 8080
+pm2 start server.js  --name="Server2" --watch -i max -- 8080
+pm2 list
+pm2 stop 'all'
+pm2 delete 'all'
+
+//NGINX
+//La configuración está en la carpeta CONF
+pm2 start server.js --name="Server1" --watch -- -p 8080 -m FORK          
+pm2 start server.js --name="Server2" --watch -- -p 8081 -m FORK          
+
+//Comentar en nginx.conf como se ve a continación lo que está dentro de la location /randoms
+// # proxy_pass http://node_cluster;
+// proxy_pass http://node_random;
+
+pm2 start server.js --name="Server3" --watch -i 1 -- -p 8082 -m CLUSTER
+pm2 start server.js --name="Server4" --watch -i 1 -- -p 8083 -m CLUSTER
+pm2 start server.js --name="Server5" --watch -i 1 -- -p 8084 -m CLUSTER
+pm2 start server.js --name="Server6" --watch -i 1 -- -p 8085 -m CLUSTER
+
+En mis pruebas no logré hacer el envio al 8081 de las llamadas del random y luego al momento de querer trabajar con CLUSTER me arrojaba el siguiente error, 
+no encontré una solución a estos problemas.
+
+3|Server6 | at importModuleDynamicallyWrapper (node:internal/vm/module:437:21)
+3|Server6 | at importModuleDynamically (node:vm:381:46)
+3|Server6 | at importModuleDynamicallyCallback (node:internal/process/esm_loader:35:14)
+3|Server6 | You have triggered an unhandledRejection, you may have forgotten to catch a Promise rejection:
+3|Server6 | Error [ERR_UNSUPPORTED_ESM_URL_SCHEME]: Only URLs with a scheme in: file, data are supported by the default ESM loader. On Windows, absolute paths must be valid file:// URLs. Received protocol ‘f:’
+3|Server6 | at new NodeError (node:internal/errors:372:5)
+3|Server6 | at throwIfUnsupportedURLScheme (node:internal/modules/esm/resolve:1075:11)
+3|Server6 | at defaultResolve (node:internal/modules/esm/resolve:1155:3)
+3|Server6 | at ESMLoader.resolve (node:internal/modules/esm/loader:604:30)
+3|Server6 | at ESMLoader.getModuleJob (node:internal/modules/esm/loader:318:18)
+3|Server6 | at ESMLoader.import (node:internal/modules/esm/loader:404:22)
+3|Server6 | at importModuleDynamically (node:internal/modules/cjs/loader:1037:29)
+3|Server6 | at importModuleDynamicallyWrapper (node:internal/vm/module:437:21)
+3|Server6 | at importModuleDynamically (node:vm:381:46)
+3|Server6 | at importModuleDynamicallyCallback (node:internal/process/esm_loader:35:14)
+
